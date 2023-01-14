@@ -27,7 +27,7 @@ final class YearTest extends TestCase
 
     public function yearProvider(): iterable
     {
-        yield 'A positive int will successfully create a AD Year' => [
+        yield 'A positive int of 4 digits will successfully create a Year' => [
             'year' => 2023,
             'test' => function (Year|Throwable $year) {
                 self::assertEquals('2023', $year->toInt());
@@ -43,17 +43,6 @@ final class YearTest extends TestCase
             'year' => 2023,
             'test' => function (Year|Throwable $year) {
                 self::assertEquals('2022', $year->previous()->toInt());
-            },
-        ];
-        yield 'A year can not traverse to a previous year below zero' => [
-            'year' => 0,
-            'test' => function (Year|Throwable $year) {
-                try {
-                    $result = $year->previous()->toInt();
-                } catch (Throwable $e) {
-                    $result = $e;
-                }
-                self::assertInstanceOf(InvalidArgumentException::class, $result);
             },
         ];
     }

@@ -23,8 +23,8 @@ final class Year implements YearInterface
     private function __construct(
         private readonly int $year
     ) {
-        if (strlen((string)$this->year) >= 4) {
-            throw new InvalidArgumentException('A year must be represented as a minimum of 4 digets.');
+        if (strlen((string)$this->year) < 4) {
+            throw new InvalidArgumentException('A year must be represented as a minimum of 4 digits.');
         }
 
         if ($this->year < 0) {
