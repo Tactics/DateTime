@@ -1,0 +1,27 @@
+#file: noinspection SpellCheckingInspection
+name: Quality Assurance
+on:
+    push: ~
+    pull_request: ~
+
+jobs:
+    quality_assurance:
+        name: Quality Assurance on ${{ matrix.php }}
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php: [ '8.1', '8.2' ]
+                composer-flags: [ '--ansi' ]
+                phpunit-flags: [ '--coverage-text' ]
+                phpstan-flags: [ '-error-format github', '--ansi' ]
+        steps:
+            - uses: actions/checkout@v3
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  coverage: xdebug
+                  tools: composer:v2
+            - run: composer update --no-progress ${{ matrix.composer-flags }}
+            - run: vendor/bin/ecs check --config ecs.php
+            - run: vendor/bin/phpunit ${{ matrix.phpunit-flags }}
+            - run: vendor/bin/phpstan ${{ matrix.phpstan-flags }}
