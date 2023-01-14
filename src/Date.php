@@ -18,7 +18,7 @@ final class Date implements MutableDateInterface
     ) {
         $errors = $this->dateTime::getLastErrors();
 
-        if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
+        if ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'A day of birth can only be created from a strictly valid DateTimeImmutable.
