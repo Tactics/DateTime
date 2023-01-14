@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1673733998">
-  <project timestamp="1673733998">
+<coverage generated="1673735766">
+  <project timestamp="1673735766">
     <file name="/var/www/html/src/ClockAwareDate.php">
       <class name="Tactics\DateTime\ClockAwareDate" namespace="global">
         <metrics complexity="8" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="15" coveredstatements="15" elements="22" coveredelements="22"/>

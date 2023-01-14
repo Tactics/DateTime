@@ -26,7 +26,7 @@ final class ClockAwareDateTest extends TestCase
                 dateTime: $dateTime,
                 clock: new MockClock($now)
             );
-        } catch (Throwable $e) {
+        } catch (InvalidArgumentException $e) {
             $date = $e;
         }
         $tests($date);
@@ -37,21 +37,21 @@ final class ClockAwareDateTest extends TestCase
         yield 'A valid datetime will successfully create a clock aware date' => [
             'now' => '1986-04-25',
             'date' => '1986-04-25',
-            'test' => function (ClockAwareDate|Throwable $clockAwareDate) {
+            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
                 self::assertEquals('1986-04-25', $clockAwareDate->date()->toDateTime()->format('Y-m-d'));
             },
         ];
         yield 'A clock aware date can return the current datetime' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (ClockAwareDate|Throwable $clockAwareDate) {
+            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
                 self::assertEquals('2023-01-01', $clockAwareDate->now()->format('Y-m-d'));
             },
         ];
         yield 'A clock aware date knows if it is in the future' => [
             'now' => '2023-01-01',
             'date' => '2023-01-02',
-            'test' => function (ClockAwareDate|Throwable $clockAwareDate) {
+            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
                 self::assertTrue($clockAwareDate->isFuture());
                 self::assertFalse($clockAwareDate->isPast());
             },
@@ -59,7 +59,7 @@ final class ClockAwareDateTest extends TestCase
         yield 'A clock aware date knows if it is in the past' => [
             'now' => '2023-01-01',
             'date' => '2022-01-02',
-            'test' => function (ClockAwareDate|Throwable $clockAwareDate) {
+            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
                 self::assertTrue($clockAwareDate->isPast());
                 self::assertFalse($clockAwareDate->isFuture());
             },
@@ -67,7 +67,7 @@ final class ClockAwareDateTest extends TestCase
         yield 'A clock aware date must be derived from a strictly correct datetime without warnings or errors before it successfully gets created' => [
             'now' => '2023-01-01',
             'date' => '1986-04-32',
-            'test' => function (ClockAwareDate|Throwable $clockAwareDate) {
+            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
                 self::assertInstanceOf(InvalidArgumentException::class, $clockAwareDate);
             },
         ];

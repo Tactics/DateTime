@@ -40,14 +40,14 @@ final class DayOfBirthTest extends TestCase
         yield 'A valid datetime in the past will successfully create a day of birth' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 self::assertEquals('1986-04-25', $dayOfBirth->toDateTime()->format('Y-m-d'));
             },
         ];
         yield 'A birthday can be derived from the day of birth' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 $age = YearsOfAge::from(years: 16);
                 $sweetSixteen = $dayOfBirth->when(age: $age);
                 self::assertEquals('2002-04-25', $sweetSixteen->format('Y-m-d'));
@@ -56,7 +56,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A moment in time can be determined based on a date of birth' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 $age = YearsOfAge::from(years: 1, andXMonths: 10);
                 $twentyTwoMonths = $dayOfBirth->when(age: $age);
                 self::assertEquals('1988-02-25', $twentyTwoMonths->format('Y-m-d'));
@@ -65,7 +65,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A datetime can be compared against a birthday to validate a person is below a certain age' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 $eighteen = YearsOfAge::from(years: 18);
                 self::assertFalse($dayOfBirth->is(
                     age: $eighteen,
@@ -76,7 +76,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A datetime can be compared against a birthday to validate a person is above a certain age' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 $eighteen = YearsOfAge::from(years: 18);
                 self::assertTrue($dayOfBirth->is(
                     age: $eighteen,
@@ -87,7 +87,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A datetime can be compared against a birthday to validate a person turns a certain age on that day' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 $eighteen = YearsOfAge::from(years: 18);
                 self::assertTrue($dayOfBirth->is(
                     age: $eighteen,
@@ -98,7 +98,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A day of birth can be compared against any datetime for equality' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 self::assertTrue($dayOfBirth->isSame(
                     dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-25')
                 ));
@@ -110,7 +110,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A day of birth can be evaluated against a certain datetime to see whether is falls before this datetime' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 self::assertFalse($dayOfBirth->isBefore(
                     dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-24')
                 ));
@@ -123,7 +123,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A day of birth can be evaluated against a certain datetime to see whether is falls after this datetime' => [
             'now' => '2023-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 self::assertTrue($dayOfBirth->isAfter(
                     dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-24')
                 ));
@@ -136,7 +136,7 @@ final class DayOfBirthTest extends TestCase
         yield 'A day of birth can not be in the future' => [
             'now' => '1986-01-01',
             'date' => '1986-04-25',
-            'test' => function (DayOfBirth|Throwable $dayOfBirth) {
+            'test' => function (DayOfBirth|InvalidArgumentException $dayOfBirth) {
                 self::assertInstanceOf(InvalidArgumentException::class, $dayOfBirth);
             },
         ];

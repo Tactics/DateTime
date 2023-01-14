@@ -19,7 +19,7 @@ final class YearTest extends TestCase
     {
         try {
             $yearAd = Year::for($year);
-        } catch (Throwable $e) {
+        } catch (InvalidArgumentException $e) {
             $yearAd = $e;
         }
         $tests($yearAd);
@@ -29,19 +29,19 @@ final class YearTest extends TestCase
     {
         yield 'A positive int of 4 digits will successfully create a Year' => [
             'year' => 2023,
-            'test' => function (Year|Throwable $year) {
+            'test' => function (Year|InvalidArgumentException $year) {
                 self::assertEquals('2023', $year->toInt());
             },
         ];
         yield 'A year can traverse to the next year' => [
             'year' => 2023,
-            'test' => function (Year|Throwable $year) {
+            'test' => function (Year|InvalidArgumentException $year) {
                 self::assertEquals('2024', $year->next()->toInt());
             },
         ];
         yield 'A year can traverse to the previous year' => [
             'year' => 2023,
-            'test' => function (Year|Throwable $year) {
+            'test' => function (Year|InvalidArgumentException $year) {
                 self::assertEquals('2022', $year->previous()->toInt());
             },
         ];

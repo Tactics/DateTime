@@ -28,7 +28,7 @@ final class DueDateTest extends TestCase
 
         try {
             $dueDate = DueDate::from($date);
-        } catch (Throwable $e) {
+        } catch (InvalidArgumentException $e) {
             $dueDate = $e;
         }
         $tests($dueDate);
@@ -39,21 +39,21 @@ final class DueDateTest extends TestCase
         yield 'A valid datetime in the future will successfully create a due date' => [
             'now' => '2023-01-01',
             'date' => '2023-04-25',
-            'test' => function (DueDate|Throwable $dueDate) {
+            'test' => function (DueDate|InvalidArgumentException $dueDate) {
                 self::assertEquals('2023-04-25', $dueDate->toDateTime()->format('Y-m-d'));
             },
         ];
         yield 'A due date can not be in the past' => [
             'now' => '2023-01-01',
             'date' => '2022-11-21',
-            'test' => function (DueDate|Throwable $dueDate) {
+            'test' => function (DueDate|InvalidArgumentException $dueDate) {
                 self::assertInstanceOf(InvalidArgumentException::class, $dueDate);
             },
         ];
         yield 'A due date can be compared against any datetime for equality' => [
             'now' => '2023-01-01',
             'date' => '2023-02-02',
-            'test' => function (DueDate|Throwable $dueDate) {
+            'test' => function (DueDate|InvalidArgumentException $dueDate) {
                 self::assertTrue($dueDate->isSame(
                     dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-02-02')
                 ));
@@ -65,7 +65,7 @@ final class DueDateTest extends TestCase
         yield 'A due date can be evaluated against a certain datetime to see whether is falls before this datetime' => [
             'now' => '2023-01-01',
             'date' => '2023-02-02',
-            'test' => function (DueDate|Throwable $dueDate) {
+            'test' => function (DueDate|InvalidArgumentException $dueDate) {
                 self::assertFalse($dueDate->isBefore(
                     dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-01-02')
                 ));
@@ -78,7 +78,7 @@ final class DueDateTest extends TestCase
         yield 'A due date can be evaluated against a certain datetime to see whether is falls after this datetime' => [
             'now' => '2023-01-01',
             'date' => '2023-02-02',
-            'test' => function (DueDate|Throwable $dueDate) {
+            'test' => function (DueDate|InvalidArgumentException $dueDate) {
                 self::assertTrue($dueDate->isAfter(
                     dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-01-02')
                 ));
