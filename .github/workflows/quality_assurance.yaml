@@ -13,7 +13,7 @@ jobs:
                 php: [ '8.1', '8.2' ]
                 composer-flags: ['']
                 phpunit-flags: ['--coverage-text']
-                phpstan-flags: ['--xdebug']
+                phpstan-flags: ['--xdebug', '--memory-limit=-1']
         steps:
             - uses: actions/checkout@v3
             - uses: shivammathur/setup-php@v2
