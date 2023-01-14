@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1673735766">
-  <project timestamp="1673735766">
+<coverage generated="1673737588">
+  <project timestamp="1673737588">
     <file name="/var/www/html/src/ClockAwareDate.php">
       <class name="Tactics\DateTime\ClockAwareDate" namespace="global">
         <metrics complexity="8" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="15" coveredstatements="15" elements="22" coveredelements="22"/>
@@ -37,9 +37,9 @@
     </file>
     <file name="/var/www/html/src/Date.php">
       <class name="Tactics\DateTime\Date" namespace="global">
-        <metrics complexity="9" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="32" coveredstatements="32" elements="39" coveredelements="39"/>
+        <metrics complexity="10" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="32" coveredstatements="32" elements="39" coveredelements="39"/>
       </class>
-      <line num="16" type="method" name="__construct" visibility="private" complexity="3" crap="3" count="29"/>
+      <line num="16" type="method" name="__construct" visibility="private" complexity="4" crap="4" count="29"/>
       <line num="19" type="stmt" count="29"/>
       <line num="21" type="stmt" count="29"/>
       <line num="22" type="stmt" count="2"/>
