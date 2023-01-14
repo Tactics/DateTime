@@ -11,9 +11,6 @@ jobs:
         strategy:
             matrix:
                 php: [ '8.1', '8.2' ]
-                composer-flags: ['']
-                phpunit-flags: ['--coverage-text']
-                phpstan-flags: ['--xdebug']
         steps:
             - uses: actions/checkout@v3
             - uses: shivammathur/setup-php@v2
@@ -21,7 +18,7 @@ jobs:
                   php-version: ${{ matrix.php }}
                   coverage: xdebug
                   tools: composer:v2
-            - run: composer update --no-progress ${{ matrix.composer-flags }}
+            - run: composer update --no-progress
             - run: vendor/bin/ecs check --config ecs.php
-            - run: vendor/bin/phpunit ${{ matrix.phpunit-flags }}
-            - run: vendor/bin/phpstan --memory-limit=-1 --debug ${{ matrix.phpstan-flags }}
+            - run: vendor/bin/phpunit --coverage-text
+            - run: vendor/bin/phpstan --memory-limit=-1 --debug --xdebug
