@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tactics\DateTime;
 
+use DateTimeImmutable;
 use InvalidArgumentException;
 
 /**
@@ -56,5 +57,23 @@ final class Year implements YearInterface
             return YearBC::for($this->year - 1);
         }
         return new Year($this->year - 1);
+    }
+
+    public function firstDay(): DateTimeImmutable
+    {
+        $year = (string) $this->year;
+        if (strlen($year) < 4) {
+            $padded = str_pad($year, 4, '0', STR_PAD_LEFT);
+        }
+        return new DateTimeImmutable('-' . $padded . '-01-01');
+    }
+
+    public function lastDay(): DateTimeImmutable
+    {
+        $year = (string) $this->year;
+        if (strlen($year) < 4) {
+            $padded = str_pad($year, 4, '0', STR_PAD_LEFT);
+        }
+        return new DateTimeImmutable('-' . $padded . '-12-31');
     }
 }
