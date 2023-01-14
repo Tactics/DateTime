@@ -43,5 +43,4 @@ final class DueDate implements DateInterface
     {
         return $this->date->date()->isAfter($dateTime);
     }
-
 }

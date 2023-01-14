@@ -18,11 +18,9 @@ use InvalidArgumentException;
  */
 final class YearBC implements YearInterface
 {
-
     private function __construct(
         private readonly int $year
-    )
-    {
+    ) {
         if ($this->year <= 0) {
             throw new InvalidArgumentException('A year before the birth of christ can only be a positive number');
         }

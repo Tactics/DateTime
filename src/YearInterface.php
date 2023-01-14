@@ -8,9 +8,9 @@ use DateTimeImmutable;
 
 interface YearInterface
 {
-    public function firstDay() : DateTimeImmutable;
+    public function firstDay(): DateTimeImmutable;
 
-    public function lastDay() : DateTimeImmutable;
+    public function lastDay(): DateTimeImmutable;
 
     public function previous(): YearInterface;
 
