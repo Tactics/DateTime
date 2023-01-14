@@ -11,7 +11,7 @@ jobs:
         strategy:
             matrix:
                 php: [ '8.1', '8.2' ]
-                composer-flags: []
+                composer-flags: ['']
                 phpunit-flags: [ '--coverage-text' ]
                 phpstan-flags: [ '--error-format github', '--xdebug']
         steps:
