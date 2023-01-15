@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit;
+namespace Tactics\DateTime\Unit;
 
 use DateTimeImmutable;
 use InvalidArgumentException;

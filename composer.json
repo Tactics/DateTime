@@ -33,7 +33,7 @@
             "vendor/bin/ecs check --config ecs.php"
         ],
         "test": [
-            "vendor/bin/phpunit --testdox --coverage-clover clover.xml"
+            "vendor/bin/phpunit --testdox"
         ],
         "phpstan": [
             "vendor/bin/phpstan analyse --memory-limit=-1 --ansi"
