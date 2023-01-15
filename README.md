@@ -1,11 +1,9 @@
 [project-name]: DateTime
 [project-url]: https://github.com/Tactics/DateTime
 [project-build]: https://github.com/Tactics/DateTime/actions/workflows/quality_assurance.yaml/badge.svg
-[project-tests]: https://github.com/Tactics/DateTime/blob/main/badge-coverage.svg
 
 # DateTime
 ![Build][project-build]
-![Tests][project-tests]
 [![Software License][ico-license]](LICENSE.md)
 
 Provide a detailed description of the project.
