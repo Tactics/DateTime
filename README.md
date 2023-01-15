@@ -4,7 +4,6 @@
 
 # DateTime
 ![Build][project-build]
-![Tests][project-tests]
 [![Software License][ico-license]](LICENSE.md)
 
 Provide a detailed description of the project.
