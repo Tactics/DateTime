@@ -7,7 +7,6 @@ namespace Tactics\DateTime\Unit;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Tactics\DateTime\Year;
-use Throwable;
 
 final class YearTest extends TestCase
 {
