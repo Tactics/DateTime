@@ -114,8 +114,5 @@ final class YearsOfAgeTest extends TestCase
                 self::assertInstanceOf(InvalidArgumentException::class, $yearsOfAge);
             },
         ];
-
-
     }
-
 }
