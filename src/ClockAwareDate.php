@@ -13,7 +13,7 @@ final class ClockAwareDate implements ClockAwareInterface
 {
     private function __construct(
         protected Date $date,
-        protected readonly ?ClockInterface $clock = null
+        protected readonly ClockInterface $clock
     ) {
     }
 
@@ -26,14 +26,13 @@ final class ClockAwareDate implements ClockAwareInterface
         );
         return new ClockAwareDate(
             date: $date,
-            clock: $clock
+            clock: $clock ?: new NativeClock($date->toDateTime()->getTimezone())
         );
     }
 
     public function now(): DateTimeImmutable
     {
-        return $this->clock->now() ?:
-            (new NativeClock($this->date()->toDateTime()->getTimezone()))->now();
+        return $this->clock->now();
     }
 
     public function date(): DateInterface

@@ -29,7 +29,7 @@ final class YearsOfAge
         }
 
         $diff = $dayOfBirth->toDateTime()->diff($dateTime);
-        return new self($diff->m);
+        return new self(($diff->y * 12) + $diff->m);
     }
 
     public static function from(int $years, int $andXMonths = 0): YearsOfAge
