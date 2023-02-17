@@ -6,41 +6,41 @@ namespace Tactics\DateTime;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
+use Tactics\DateTime\Exception\InvalidDueDate;
 
-final class DueDate implements DateInterface
+final class DueDate
 {
     private function __construct(
-        protected ClockAwareDate $date,
+        protected ClockAwareDateTime $date,
     ) {
         if (!$this->date->isFuture()) {
-            throw new InvalidArgumentException('A due date can only be in the future');
+            throw InvalidDueDate::inPast();
         }
     }
 
     public static function from(
-        ClockAwareDate $dateTime
+        ClockAwareDateTime $dateTime
     ): DueDate {
         return new DueDate($dateTime);
     }
 
-    public function toDateTime(): DateTimeImmutable
+    public function toPhpDateTime(): DateTimeImmutable
     {
-        return $this->date->date()->toDateTime();
+        return $this->date->asDateTimePlus()->toPhpDateTime();
     }
 
-    public function isSame(DateTimeInterface $dateTime): bool
+    public function isSameDay(DateTimeInterface $dateTime): bool
     {
-        return $this->date->date()->isSame($dateTime);
+        return $this->date->asDateTimePlus()->isSameDay($dateTime);
     }
 
     public function isBefore(DateTimeInterface $dateTime): bool
     {
-        return $this->date->date()->isBefore($dateTime);
+        return $this->date->asDateTimePlus()->isBefore($dateTime);
     }
 
     public function isAfter(DateTimeInterface $dateTime): bool
     {
-        return $this->date->date()->isAfter($dateTime);
+        return $this->date->asDateTimePlus()->isAfter($dateTime);
     }
 }

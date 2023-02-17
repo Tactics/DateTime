@@ -8,19 +8,20 @@ use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
+use Tactics\DateTime\Exception\InvalidDayOfBirth;
 
-final class DayOfBirth implements DateInterface
+final class DayOfBirth
 {
     protected function __construct(
-        protected ClockAwareDate $date,
+        protected ClockAwareDateTime $date,
     ) {
         if ($this->date->isFuture()) {
-            throw new InvalidArgumentException('A day of birth can not be in the future');
+            throw InvalidDayOfBirth::inFuture();
         }
     }
 
     public static function from(
-        ClockAwareDate $dateTime
+        ClockAwareDateTime $dateTime
     ): DayOfBirth {
         return new DayOfBirth($dateTime);
     }
@@ -36,26 +37,26 @@ final class DayOfBirth implements DateInterface
 
     public function when(YearsOfAge $age): DateTimeImmutable
     {
-        return $this->date->add(months: $age->inMonths())->date()->toDateTime();
+        return $this->date->add(months: $age->inMonths())->asDateTimePlus()->toPhpDateTime();
     }
 
     public function toDateTime(): DateTimeImmutable
     {
-        return $this->date->date()->toDateTime();
+        return $this->date->asDateTimePlus()->toPhpDateTime();
     }
 
-    public function isSame(DateTimeInterface $dateTime): bool
+    public function isSameDay(DateTimeInterface $dateTime): bool
     {
-        return $this->date->date()->isSame($dateTime);
+        return $this->date->asDateTimePlus()->isSameDay($dateTime);
     }
 
     public function isBefore(DateTimeInterface $dateTime): bool
     {
-        return $this->date->date()->isBefore($dateTime);
+        return $this->date->asDateTimePlus()->isBefore($dateTime);
     }
 
     public function isAfter(DateTimeInterface $dateTime): bool
     {
-        return $this->date->date()->isAfter($dateTime);
+        return $this->date->asDateTimePlus()->isAfter($dateTime);
     }
 }

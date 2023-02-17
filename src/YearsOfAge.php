@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tactics\DateTime;
 
 use DateTimeInterface;
-use InvalidArgumentException;
+use Tactics\DateTime\Exception\InvalidYearsOfAge;
 
 final class YearsOfAge
 {
@@ -15,7 +15,7 @@ final class YearsOfAge
     private function __construct(int $months)
     {
         if ($months < 0) {
-            throw new InvalidArgumentException('A year of age can only be a positive number');
+            throw InvalidYearsOfAge::negativeNumber();
         }
 
         $this->months = $months;

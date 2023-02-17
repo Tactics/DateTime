@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
+
 namespace Tactics\DateTime\Unit;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Clock\MockClock;
-use Tactics\DateTime\ClockAwareDate;
+use Tactics\DateTime\ClockAwareDateTime;
+use Tactics\DateTime\DateTimePlus;
 use Tactics\DateTime\DayOfBirth;
-use Tactics\DateTime\DueDate;
+use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
+use Tactics\DateTime\Exception\InvalidDueDate;
+use Tactics\DateTime\Exception\InvalidYearsOfAge;
 use Tactics\DateTime\YearsOfAge;
-use Throwable;
 
 final class YearsOfAgeTest extends TestCase
 {
@@ -24,7 +27,7 @@ final class YearsOfAgeTest extends TestCase
     {
         try {
             $yearsOfAge = YearsOfAge::from($years, $months);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidYearsOfAge $e) {
             $yearsOfAge = $e;
         }
         $tests($yearsOfAge);
@@ -34,17 +37,15 @@ final class YearsOfAgeTest extends TestCase
      * @test
      * @dataProvider onProvider
      */
-    public function years_of_age_on(string $now, string $day_of_birth, callable $tests): void
+    public function years_of_age_on(DateTimeImmutable $now, DateTimePlus $day_of_birth, callable $tests): void
     {
-        $now = DateTimeImmutable::createFromFormat('Y-m-d', $now);
-        $dateTime = DateTimeImmutable::createFromFormat('Y-m-d', $day_of_birth);
-        $date = ClockAwareDate::from(
-            dateTime: $dateTime,
+        $date = ClockAwareDateTime::from(
+            dateTimePlus: $day_of_birth,
         );
         $dayOfBirth = DayOfBirth::from($date);
         try {
             $yearsOfAge = YearsOfAge::on($now, $dayOfBirth);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidYearsOfAge $e) {
             $yearsOfAge = $e;
         }
         $tests($yearsOfAge);
@@ -52,26 +53,27 @@ final class YearsOfAgeTest extends TestCase
 
     public function onProvider(): iterable
     {
+
         yield 'The age in years on a certain day can be derived' => [
-            'now' => '2023-01-01',
-            'day_of_birth' => '2020-04-25',
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
+            'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2023-01-01T12:00:00+00:00'),
+            'day_of_birth' => DateTimePlus::from('2020-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('2', $yearsOfAge->inYears());
             },
         ];
 
         yield 'The age in months on a certain day can be derived' => [
-            'now' => '2023-01-01',
-            'day_of_birth' => '2020-04-25',
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
+            'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2023-01-01T12:00:00+00:00'),
+            'day_of_birth' => DateTimePlus::from('2020-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('32', $yearsOfAge->inMonths());
             },
         ];
 
         yield 'The age is always 0 when the day of birth is before the compared date' => [
-            'now' => '2020-04-25',
-            'day_of_birth' => '2023-01-01',
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
+            'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2020-04-25T12:00:00+00:00'),
+            'day_of_birth' => DateTimePlus::from('2023-01-01T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('0', $yearsOfAge->inYears());
                 self::assertEquals('0', $yearsOfAge->inMonths());
             },
@@ -80,10 +82,11 @@ final class YearsOfAgeTest extends TestCase
 
     public function fromProvider(): iterable
     {
+
         yield 'The age in years can be created from months only' => [
             'years' => 0,
             'months' => 34,
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('2', $yearsOfAge->inYears());
                 self::assertEquals('34', $yearsOfAge->inMonths());
             },
@@ -92,7 +95,7 @@ final class YearsOfAgeTest extends TestCase
         yield 'The age in years can be created from years only' => [
             'years' => 4,
             'months' => 0,
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('4', $yearsOfAge->inYears());
                 self::assertEquals('48', $yearsOfAge->inMonths());
             },
@@ -101,7 +104,7 @@ final class YearsOfAgeTest extends TestCase
         yield 'The age in years can be created from months and years only' => [
             'years' => 2,
             'months' => 8,
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('2', $yearsOfAge->inYears());
                 self::assertEquals('32', $yearsOfAge->inMonths());
             },
@@ -110,8 +113,8 @@ final class YearsOfAgeTest extends TestCase
         yield 'A year of age can only be a positive number' => [
             'years' => -2,
             'months' => 0,
-            'test' => function (YearsOfAge|InvalidArgumentException $yearsOfAge) {
-                self::assertInstanceOf(InvalidArgumentException::class, $yearsOfAge);
+            'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
+                self::assertInstanceOf(InvalidYearsOfAge::class, $yearsOfAge);
             },
         ];
     }

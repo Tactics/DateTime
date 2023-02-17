@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Tactics\DateTime\Unit;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
-use Tactics\DateTime\ClockAwareDate;
-use Throwable;
+use Tactics\DateTime\ClockAwareDateTime;
+use Tactics\DateTime\DateTimePlus;
+use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
 
 final class ClockAwareDateTest extends TestCase
 {
@@ -17,58 +19,69 @@ final class ClockAwareDateTest extends TestCase
      * @test
      * @dataProvider clockAwareDateProvider
      */
-    public function clock_aware_date(string $now, string $date, callable $tests): void
+    public function clock_aware_date(DateTimeImmutable $now, DateTimePlus $dateTimePlus, callable $tests): void
     {
-        $now = DateTimeImmutable::createFromFormat('Y-m-d', $now);
-        $dateTime = DateTimeImmutable::createFromFormat('Y-m-d', $date);
-        try {
-            $date = ClockAwareDate::from(
-                dateTime: $dateTime,
-                clock: new MockClock($now)
-            );
-        } catch (InvalidArgumentException $e) {
-            $date = $e;
-        }
+        $date = ClockAwareDateTime::from(
+            dateTimePlus: $dateTimePlus,
+            clock: new MockClock($now)
+        );
         $tests($date);
     }
 
     public function clockAwareDateProvider(): iterable
     {
         yield 'A valid datetime will successfully create a clock aware date' => [
-            'now' => '1986-04-25',
-            'date' => '1986-04-25',
-            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
-                self::assertEquals('1986-04-25', $clockAwareDate->date()->toDateTime()->format('Y-m-d'));
+            'now' => DateTimeImmutable::createFromFormat(
+                DateTimeInterface::ATOM,
+                '1986-04-25T12:00:00+00:00'
+            ),
+            'dateTimePlus' => DateTimePlus::from(
+                '1986-04-25T12:00:00+00:00',
+                FormatWithTimezone::ATOM
+            ),
+            'test' => function (ClockAwareDateTime $clockAwareDate) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $clockAwareDate->asDateTimePlus()->toPhpDateTime()->format(DateTimeInterface::ATOM));
             },
         ];
         yield 'A clock aware date can return the current datetime' => [
-            'now' => '2023-01-01',
-            'date' => '1986-04-25',
-            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
-                self::assertEquals('2023-01-01', $clockAwareDate->now()->format('Y-m-d'));
+            'now' => DateTimeImmutable::createFromFormat(
+                DateTimeInterface::ATOM,
+                '2023-01-01T12:00:00+00:00'
+            ),
+            'dateTimePlus' => DateTimePlus::from(
+                '1986-04-25T12:00:00+00:00',
+                FormatWithTimezone::ATOM
+            ),
+            'test' => function (ClockAwareDateTime $clockAwareDate) {
+                self::assertEquals('2023-01-01T12:00:00+00:00', $clockAwareDate->now()->format(DateTimeInterface::ATOM));
             },
         ];
         yield 'A clock aware date knows if it is in the future' => [
-            'now' => '2023-01-01',
-            'date' => '2023-01-02',
-            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
+            'now' => DateTimeImmutable::createFromFormat(
+                DateTimeInterface::ATOM,
+                '2023-01-01T12:00:00+00:00'
+            ),
+            'dateTimePlus' => DateTimePlus::from(
+                '2023-01-02T12:00:00+00:00',
+                FormatWithTimezone::ATOM
+            ),
+            'test' => function (ClockAwareDateTime $clockAwareDate) {
                 self::assertTrue($clockAwareDate->isFuture());
                 self::assertFalse($clockAwareDate->isPast());
             },
         ];
         yield 'A clock aware date knows if it is in the past' => [
-            'now' => '2023-01-01',
-            'date' => '2022-01-02',
-            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
+            'now' => DateTimeImmutable::createFromFormat(
+                DateTimeInterface::ATOM,
+                '2023-01-01T12:00:00+00:00'
+            ),
+            'dateTimePlus' => DateTimePlus::from(
+                '2022-01-02T12:00:00+00:00',
+                FormatWithTimezone::ATOM
+            ),
+            'test' => function (ClockAwareDateTime $clockAwareDate) {
                 self::assertTrue($clockAwareDate->isPast());
                 self::assertFalse($clockAwareDate->isFuture());
-            },
-        ];
-        yield 'A clock aware date must be derived from a strictly correct datetime without warnings or errors before it successfully gets created' => [
-            'now' => '2023-01-01',
-            'date' => '1986-04-32',
-            'test' => function (ClockAwareDate|InvalidArgumentException $clockAwareDate) {
-                self::assertInstanceOf(InvalidArgumentException::class, $clockAwareDate);
             },
         ];
     }
