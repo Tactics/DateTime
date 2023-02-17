@@ -6,7 +6,6 @@ use LogicException;
 
 class InvalidYearsOfAge extends LogicException
 {
-
     public const NEGATIVE_NUMBER = 1;
 
     public static function negativeNumber(): self

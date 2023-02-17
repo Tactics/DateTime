@@ -7,10 +7,12 @@ namespace Tactics\DateTime\Unit;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use IntlCalendar;
 use PHPUnit\Framework\TestCase;
 use Tactics\DateTime\DateTimePlus;
 use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
 use Tactics\DateTime\Exception\InvalidDateTimePlus;
+use Tactics\DateTime\Exception\InvalidDateTimePlusFormatting;
 
 final class DateTimePlusTest extends TestCase
 {
@@ -22,8 +24,7 @@ final class DateTimePlusTest extends TestCase
         string $raw,
         FormatWithTimezone $format,
         callable $tests
-    ): void
-    {
+    ): void {
         try {
             $date = DateTimePlus::from(
                 raw: $raw,
@@ -49,11 +50,20 @@ final class DateTimePlusTest extends TestCase
                 self::assertEquals('26 april', $date->format("dd MMMM", 'nl_be', new DateTimeZone('Pacific/Wallis')));
             },
         ];
+        yield 'A date must be derived from a valid datetime and format combination' => [
+            'raw' => '1986-04-32T12',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertInstanceOf(InvalidDateTimePlus::class, $date);
+                self::assertEquals(InvalidDateTimePlus::INVALID_DATE, $date->getCode());
+            },
+        ];
         yield 'A date must be derived from a strictly correct datetime without warnings or errors before it successfully gets created' => [
             'raw' => '1986-04-32T12:00:00+00:00',
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertInstanceOf(InvalidDateTimePlus::class, $date);
+                self::assertEquals(InvalidDateTimePlus::NOT_STRICTLY_VALID_DATE, $date->getCode());
             },
         ];
         yield 'A date can be compared against any datetime for day equality' => [
@@ -154,6 +164,41 @@ final class DateTimePlusTest extends TestCase
                     months: 2,
                     days: 2
                 )->toPhpDateTime()->format('Y-m-d'));
+            },
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider dateFormattingProvider
+     */
+    public function date_formatting(
+        DateTimePlus $dateTimePlus,
+        string $format,
+        string $locale,
+        DateTimeZone|null $displayTimeZone,
+        IntlCalendar|null $calendar,
+        callable $tests
+    ): void {
+        try {
+            $date = $dateTimePlus->format($format, $locale);
+        } catch (InvalidDateTimePlusFormatting $e) {
+            $date = $e;
+        }
+        $tests($date);
+    }
+
+    public function dateFormattingProvider(): iterable
+    {
+        yield 'formatting a date time plus requires a valid format' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'format' => 'invalid',
+            'locale' => 'en_US',
+            'timeZone' => null,
+            'calendar' => null,
+            'test' => function (string|InvalidDateTimePlusFormatting $formatted) {
+                self::assertInstanceOf(InvalidDateTimePlusFormatting::class, $formatted);
+                self::assertEquals(InvalidDateTimePlusFormatting::FAILED_FORMATTING, $formatted->getCode());
             },
         ];
     }

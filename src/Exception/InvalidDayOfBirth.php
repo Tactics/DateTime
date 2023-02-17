@@ -6,7 +6,6 @@ use LogicException;
 
 class InvalidDayOfBirth extends LogicException
 {
-
     public const IN_FUTURE = 1;
 
     public static function inFuture(): self

@@ -53,7 +53,6 @@ final class YearsOfAgeTest extends TestCase
 
     public function onProvider(): iterable
     {
-
         yield 'The age in years on a certain day can be derived' => [
             'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2023-01-01T12:00:00+00:00'),
             'day_of_birth' => DateTimePlus::from('2020-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
@@ -82,7 +81,6 @@ final class YearsOfAgeTest extends TestCase
 
     public function fromProvider(): iterable
     {
-
         yield 'The age in years can be created from months only' => [
             'years' => 0,
             'months' => 34,

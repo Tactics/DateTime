@@ -6,7 +6,6 @@ use LogicException;
 
 class InvalidDueDate extends LogicException
 {
-
     public const IN_PAST = 1;
 
     public static function inPast(): self

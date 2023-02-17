@@ -38,6 +38,11 @@
         ],
         "phpstan": [
             "vendor/bin/phpstan analyse --memory-limit=-1 --ansi"
+        ],
+        "quality-assurance": [
+            "vendor/bin/ecs check --config ecs.php",
+            "vendor/bin/phpunit --coverage-text",
+            "vendor/bin/phpstan --memory-limit=-1 --debug --xdebug"
         ]
     }
 }

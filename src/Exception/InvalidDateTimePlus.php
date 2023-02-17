@@ -5,15 +5,17 @@ namespace Tactics\DateTime\Exception;
 use LogicException;
 use Throwable;
 
-class InvalidDateTimePlus extends LogicException {
+class InvalidDateTimePlus extends LogicException
+{
+    public const INVALID_DATE = 1;
 
-    public const INVALID_LENGTH = 1;
+    public const NOT_STRICTLY_VALID_DATE = 2;
 
     public static function invalidDate(): self
     {
         return new self(
-            sprintf('A child code can only be %s characters long', ChildCode::LENGTH),
-            self::INVALID_LENGTH
+            'A date can only be create fro a valid format and string combination',
+            self::INVALID_DATE
         );
     }
 
@@ -34,12 +36,7 @@ class InvalidDateTimePlus extends LogicException {
                     array: $errors['errors']
                 ),
             ),
-            self::INVALID_LENGTH
+            self::NOT_STRICTLY_VALID_DATE
         );
     }
-
-
-
-
-
 }

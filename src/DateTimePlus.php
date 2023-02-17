@@ -13,6 +13,7 @@ use IntlDateFormatter;
 use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
 use Tactics\DateTime\Exception\InvalidDateTimePlus;
 use Tactics\DateTime\Exception\InvalidDateTimePlusFormatting;
+use TypeError;
 
 /**
  * DateTimePlus.
@@ -57,8 +58,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
     public static function from(
         string $raw,
         FormatWithTimezone $format,
-    ): DateTimePlus
-    {
+    ): DateTimePlus {
         return new DateTimePlus(
             raw: $raw,
             format: $format,
@@ -78,7 +78,6 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
 
     public function isBefore(DateTimeInterface $dateTime): bool
     {
-
         $toCarbon = (new Carbon($dateTime, $dateTime->getTimezone()))
             ->startOfDay();
         return $this->carbon->startOfDay()->isBefore($toCarbon);
@@ -100,9 +99,8 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
-
     /**
-     * formatWithLocale.
+     * format.
      *
      * Local aware formatting works with different formats than php DateTime.
      * It works with unicode date symbols.
@@ -115,9 +113,9 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         string $locale,
         ?DateTimeZone $displayTimeZone = null,
         ?IntlCalendar $calendar = null,
-    ): string
-    {
+    ): string {
         $timezone = $displayTimeZone ?: $this->toPhpDateTime()->getTimezone();
+
         $formatter = new IntlDateFormatter(
             locale: $locale,
             dateType: IntlDateFormatter::FULL, // defaults that won't be use since we always provide a pattern

@@ -21,5 +21,4 @@ enum FormatWithTimezone: string
 
     /** ex: 'Saturday, 01-Jan-2022 12:00:00 GMT+0000'; */
     case COOKIE = DateTimeInterface::COOKIE;
-
 }
