@@ -14,7 +14,7 @@ class InvalidDateTimePlus extends LogicException
     public static function invalidDate(): self
     {
         return new self(
-            'A date can only be create fro a valid format and string combination',
+            'A date can only be created from a valid format and string combination',
             self::INVALID_DATE
         );
     }

@@ -42,12 +42,14 @@ final class DateTimePlusTest extends TestCase
             'raw' => '1986-04-25T12:00:00+00:00',
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
-                self::assertEquals('1986-04-25', $date->format('yyyy-MM-dd', 'en'));
-                self::assertEquals('1986-04-25', $date->format('yyyy-MM-dd', 'nl_be', new DateTimeZone('Europe/Brussels')));
-                self::assertEquals('april 1986', $date->format('MMMM yyyy', 'nl_be', new DateTimeZone('Europe/Brussels')));
-                self::assertEquals('avril 1986', $date->format('MMMM yyyy', 'fr_be', new DateTimeZone('Europe/Brussels')));
-                self::assertEquals('1986-04-26T00:00:00', $date->format("yyyy-MM-dd'T'HH:mm:ss", 'nl_be', new DateTimeZone('Pacific/Wallis')));
-                self::assertEquals('26 april', $date->format("dd MMMM", 'nl_be', new DateTimeZone('Pacific/Wallis')));
+                self::assertEquals('1986-04-25', $date->formatPlus('yyyy-MM-dd', 'en'));
+                self::assertEquals('1986-04-25', $date->formatPlus('yyyy-MM-dd', 'nl_be', new DateTimeZone('CET')));
+                self::assertEquals('april 1986', $date->formatPlus('MMMM yyyy', 'nl_be', new DateTimeZone('CET')));
+                self::assertEquals('avril 1986', $date->formatPlus('MMMM yyyy', 'fr_be', new DateTimeZone('CET')));
+                self::assertEquals('1986-04-26T00:00:00', $date->formatPlus("yyyy-MM-dd'T'HH:mm:ss", 'nl_be', new DateTimeZone('Pacific/Wallis')));
+                self::assertEquals('26 april', $date->formatPlus("dd MMMM", 'nl_be', new DateTimeZone('Pacific/Wallis')));
+                self::assertEquals('514814400', $date->getTimestamp());
+                self::assertEquals('+00:00', $date->getTimezone()->getName());
             },
         ];
         yield 'A date must be derived from a valid datetime and format combination' => [
@@ -71,13 +73,13 @@ final class DateTimePlusTest extends TestCase
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertTrue($date->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T23:59:59+00:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T23:59:59+00:00')
                 ));
                 self::assertFalse($date->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T00:00:00+00:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T00:00:00+00:00')
                 ));
                 self::assertTrue($date->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T23:59:59+02:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T23:59:59+02:00')
                 ));
             }
         ];
@@ -86,19 +88,19 @@ final class DateTimePlusTest extends TestCase
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertFalse($date->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-24T00:00:00+00:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-24T00:00:00+00:00')
                 ));
 
                 self::assertTrue($date->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T00:00:00+00:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T00:00:00+00:00')
                 ));
 
                 self::assertFalse($date->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T11:00:00+02:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T11:00:00+02:00')
                 ));
 
                 self::assertTrue($date->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T13:00:00-02:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T13:00:00-02:00')
                 ));
             },
         ];
@@ -108,19 +110,19 @@ final class DateTimePlusTest extends TestCase
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertTrue($date->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-24T12:00:00+00:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-24T12:00:00+00:00')
                 ));
 
                 self::assertFalse($date->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T12:00:00+00:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T12:00:00+00:00')
                 ));
 
                 self::assertTrue($date->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T11:00:00+02:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T11:00:00+02:00')
                 ));
 
                 self::assertFalse($date->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T13:00:00-02:00')
+                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T13:00:00-02:00')
                 ));
             },
         ];
@@ -181,7 +183,7 @@ final class DateTimePlusTest extends TestCase
         callable $tests
     ): void {
         try {
-            $date = $dateTimePlus->format($format, $locale);
+            $date = $dateTimePlus->formatPlus($format, $locale);
         } catch (InvalidDateTimePlusFormatting $e) {
             $date = $e;
         }
@@ -199,6 +201,30 @@ final class DateTimePlusTest extends TestCase
             'test' => function (string|InvalidDateTimePlusFormatting $formatted) {
                 self::assertInstanceOf(InvalidDateTimePlusFormatting::class, $formatted);
                 self::assertEquals(InvalidDateTimePlusFormatting::FAILED_FORMATTING, $formatted->getCode());
+            },
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider dateConvertProvider
+     */
+    public function date_convert(
+        DateTimePlus $dateTimePlus,
+        DateTimeZone $timeZone,
+        callable $tests
+    ): void {
+        $date = $dateTimePlus->toTimeZone($timeZone);
+        $tests($date);
+    }
+
+    public function dateConvertProvider(): iterable
+    {
+        yield 'a DateTimePlus can be converted to any timezone' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'timeZone' => new DateTimeZone('CET'),
+            'test' => function (DateTimePlus $converted) {
+                self::assertEquals('1986-04-25T13:00:00+01:00', $converted->formatPlus("yyyy-MM-dd'T'HH:mm:ssxxx", 'en'));
             },
         ];
     }

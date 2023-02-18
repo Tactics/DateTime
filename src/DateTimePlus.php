@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tactics\DateTime;
 
 use Carbon\Carbon;
+use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -13,7 +14,7 @@ use IntlDateFormatter;
 use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
 use Tactics\DateTime\Exception\InvalidDateTimePlus;
 use Tactics\DateTime\Exception\InvalidDateTimePlusFormatting;
-use TypeError;
+use Throwable;
 
 /**
  * DateTimePlus.
@@ -55,6 +56,12 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         $this->carbon = new Carbon($dateTime, $dateTime->getTimezone());
     }
 
+    /**
+     * We only allow creation from a raw string in a timezone aware format
+     * since php dateTime manipulates invalid dates and after that there is
+     * no way of knowing whether the created DateTime was itself created from
+     * an invalid string.
+     */
     public static function from(
         string $raw,
         FormatWithTimezone $format,
@@ -65,27 +72,36 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
+    public function toTimeZone(DateTimeZone $timeZone): DateTimePlus
+    {
+        $carbon = $this->carbon->setTimezone($timeZone);
+        return new DateTimePlus(
+            raw: $carbon->format(FormatWithTimezone::ATOM->value),
+            format: FormatWithTimezone::ATOM,
+        );
+    }
+
     public function toPhpDateTime(): DateTimeImmutable
     {
         return $this->carbon->toDateTimeImmutable();
     }
 
-    public function isSameDay(DateTimeInterface $dateTime): bool
+    public function isSameDay(DateTimeInterface $targetObject): bool
     {
         return $this->carbon
-            ->isSameDay($dateTime);
+            ->isSameDay($targetObject);
     }
 
-    public function isBefore(DateTimeInterface $dateTime): bool
+    public function isBefore(DateTimeInterface $targetObject): bool
     {
-        $toCarbon = (new Carbon($dateTime, $dateTime->getTimezone()))
+        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()))
             ->startOfDay();
         return $this->carbon->startOfDay()->isBefore($toCarbon);
     }
 
-    public function isAfter(DateTimeInterface $dateTime): bool
+    public function isAfter(DateTimeInterface $targetObject): bool
     {
-        $toCarbon = (new Carbon($dateTime, $dateTime->getTimezone()))
+        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()))
             ->startOfDay();
         return $this->carbon->startOfDay()->isAfter($toCarbon);
     }
@@ -108,7 +124,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
      * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/
      * @see https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
      **/
-    public function format(
+    public function formatPlus(
         string $format,
         string $locale,
         ?DateTimeZone $displayTimeZone = null,
@@ -131,5 +147,15 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         }
 
         return $formatted;
+    }
+
+    public function getTimestamp(): int
+    {
+        return $this->carbon->getTimestamp();
+    }
+
+    public function getTimezone(): DateTimeZone
+    {
+        return $this->carbon->getTimezone();
     }
 }
