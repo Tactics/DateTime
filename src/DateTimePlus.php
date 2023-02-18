@@ -115,6 +115,15 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
+    public function addTime($hours = 0, $minutes = 0, $seconds = 0): DateTimePlus
+    {
+        $sum = $this->carbon->addHours($hours)->addMinutes($minutes)->addSeconds($seconds);
+        return self::from(
+            $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->value),
+            FormatWithTimezone::ATOM,
+        );
+    }
+
     /**
      * format.
      *

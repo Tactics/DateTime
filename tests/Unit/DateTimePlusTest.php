@@ -168,6 +168,48 @@ final class DateTimePlusTest extends TestCase
                 )->toPhpDateTime()->format('Y-m-d'));
             },
         ];
+
+        yield 'A date can be modified by hours' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals('1986-04-26T02:00:00+00:00', $date->addTime(
+                    hours: 14
+                )->toPhpDateTime()->format(DateTimeInterface::ATOM));
+            },
+        ];
+
+        yield 'A date can be modified by minutes' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals('1986-04-25T13:02:00+00:00', $date->addTime(
+                    minutes: 62
+                )->toPhpDateTime()->format(DateTimeInterface::ATOM));
+            },
+        ];
+
+        yield 'A date can be modified by seconds' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:01:02+00:00', $date->addTime(
+                    seconds: 62
+                )->toPhpDateTime()->format(DateTimeInterface::ATOM));
+            },
+        ];
+
+        yield 'A date can be modified by hours, minutes and seconds' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals('1986-04-25T13:02:02+00:00', $date->addTime(
+                    hours: 1,
+                    minutes: 2,
+                    seconds: 2
+                )->toPhpDateTime()->format(DateTimeInterface::ATOM));
+            },
+        ];
     }
 
     /**
