@@ -74,7 +74,8 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
 
     public function toTimeZone(DateTimeZone $timeZone): DateTimePlus
     {
-        $carbon = $this->carbon->setTimezone($timeZone);
+        $carbon = clone $this->carbon;
+        $carbon->setTimezone($timeZone);
         return new DateTimePlus(
             raw: $carbon->format(FormatWithTimezone::ATOM->value),
             format: FormatWithTimezone::ATOM,
@@ -108,7 +109,8 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
 
     public function add($years = 0, $months = 0, $days = 0): DateTimePlus
     {
-        $sum = $this->carbon->addYears($years)->addMonths($months)->addDays($days);
+        $carbon = clone $this->carbon;
+        $sum = $carbon->addYears($years)->addMonths($months)->addDays($days);
         return self::from(
             $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->value),
             FormatWithTimezone::ATOM,
@@ -117,7 +119,8 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
 
     public function addTime($hours = 0, $minutes = 0, $seconds = 0): DateTimePlus
     {
-        $sum = $this->carbon->addHours($hours)->addMinutes($minutes)->addSeconds($seconds);
+        $carbon = clone $this->carbon;
+        $sum = $carbon->addHours($hours)->addMinutes($minutes)->addSeconds($seconds);
         return self::from(
             $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->value),
             FormatWithTimezone::ATOM,
