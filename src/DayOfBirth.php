@@ -7,7 +7,6 @@ namespace Tactics\DateTime;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
 use Tactics\DateTime\Exception\InvalidDayOfBirth;
 
 final class DayOfBirth

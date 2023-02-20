@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Tactics\DateTime;
 
 use DateTimeImmutable;
-use DateTimeZone;
-use Exception;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\NativeClock;
 use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
@@ -34,7 +32,7 @@ final class ClockPlus implements ClockPlusInterface
     public function nowPlus(): DateTimePlus
     {
         return DateTimePlus::from(
-            raw: $this->now()->format(FormatWithTimezone::ATOM->value),
+            raw: $this->now()->format(FormatWithTimezone::ATOM->pattern()),
             format: FormatWithTimezone::ATOM
         );
     }

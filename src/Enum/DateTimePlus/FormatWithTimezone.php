@@ -2,8 +2,6 @@
 
 namespace Tactics\DateTime\Enum\DateTimePlus;
 
-use DateTimeInterface;
-
 /**
  * FormatWithTimezone
  *
@@ -17,8 +15,16 @@ use DateTimeInterface;
 enum FormatWithTimezone: string
 {
     /** ex: 2022-01-01T12:00:00+00:00 */
-    case ATOM = 'Y-m-d\TH:i:sP';
+    case ATOM = 'ATOM';
 
     /** ex: 'Saturday, 01-Jan-2022 12:00:00 GMT+0000'; */
-    case COOKIE = 'l, d-M-Y H:i:s T';
+    case COOKIE = 'COOKIE';
+
+    public function pattern(): string
+    {
+        return match ($this) {
+            self::ATOM => 'Y-m-d\TH:i:sP',
+            self::COOKIE => 'l, d-M-Y H:i:s T',
+        };
+    }
 }

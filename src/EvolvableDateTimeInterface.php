@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tactics\DateTime;
 
-use DateTimeInterface;
-
 /**
  * Interface for dates that allow evolution to a new date (adding days, ...)
  */

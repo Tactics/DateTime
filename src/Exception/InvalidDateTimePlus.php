@@ -3,7 +3,6 @@
 namespace Tactics\DateTime\Exception;
 
 use LogicException;
-use Throwable;
 
 class InvalidDateTimePlus extends LogicException
 {

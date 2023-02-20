@@ -40,7 +40,7 @@ final class ClockAwareDateTime implements ClockAwareInterface
     public function nowAsDateTimePlus(): DateTimePlus
     {
         return DateTimePlus::from(
-            $this->now()->format(FormatWithTimezone::ATOM->value),
+            $this->now()->format(FormatWithTimezone::ATOM->pattern()),
             FormatWithTimezone::ATOM,
         );
     }

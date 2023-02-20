@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Tactics\DateTime;
 
 use Carbon\Carbon;
-use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use IntlCalendar;
 use IntlDateFormatter;
+use Psr\Clock\ClockInterface;
 use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
+use Tactics\DateTime\Enum\DateTimePlus\StorageFormat;
 use Tactics\DateTime\Exception\InvalidDateTimePlus;
 use Tactics\DateTime\Exception\InvalidDateTimePlusFormatting;
-use Throwable;
 
 /**
  * DateTimePlus.
@@ -33,7 +33,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         private readonly FormatWithTimezone $format,
     ) {
         $dateTime = DateTimeImmutable::createFromFormat(
-            $this->format->value,
+            $this->format->pattern(),
             $this->raw,
         );
 
@@ -72,12 +72,54 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
-    public function toTimeZone(DateTimeZone $timeZone): DateTimePlus
+    /**
+     * We only allow creation from a UTC timestamp since it has timezone UTC implicitly.
+     */
+    public static function fromTimestampUTC(
+        int $timestamp,
+    ): DateTimePlus {
+        $carbon = Carbon::createFromTimestampUTC($timestamp);
+        return new DateTimePlus(
+            raw: $carbon->format(FormatWithTimezone::ATOM->pattern()),
+            format: FormatWithTimezone::ATOM,
+        );
+    }
+
+    /**
+     * We only allow creation from now if a clock is provided.
+     * In theorie the clock could have a wrong timezone but that is
+     * up to the implementation to make sure it is correct.
+     */
+    public static function fromNow(
+        ClockInterface $clock
+    ): DateTimePlus {
+        return self::from(
+            raw: $clock->now()->format(FormatWithTimezone::ATOM->pattern()),
+            format: FormatWithTimezone::ATOM
+        );
+    }
+
+    /**
+     * Normal and best practice is to store a datetime in UTC, so
+     * when no specific timezone is provided we convert the date to UTC
+     * and return it in the storage format.
+     */
+    public function toStorage(
+        StorageFormat $storageFormat,
+        ?DateTimeZone $timeZone = null
+    ): string {
+        $timeZone = $timeZone ?? new DateTimeZone('UTC');
+        $carbon = clone $this->carbon;
+        $carbon->setTimezone($timeZone);
+        return $carbon->format($storageFormat->pattern());
+    }
+
+    public function toTimezone(DateTimeZone $timeZone): DateTimePlus
     {
         $carbon = clone $this->carbon;
         $carbon->setTimezone($timeZone);
         return new DateTimePlus(
-            raw: $carbon->format(FormatWithTimezone::ATOM->value),
+            raw: $carbon->format(FormatWithTimezone::ATOM->pattern()),
             format: FormatWithTimezone::ATOM,
         );
     }
@@ -95,78 +137,80 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
 
     public function isBefore(DateTimeInterface $targetObject): bool
     {
-        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()))
-            ->startOfDay();
-        return $this->carbon->startOfDay()->isBefore($toCarbon);
+        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()));
+        return $this->carbon->isBefore($toCarbon);
     }
 
     public function isAfter(DateTimeInterface $targetObject): bool
     {
-        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()))
-            ->startOfDay();
-        return $this->carbon->startOfDay()->isAfter($toCarbon);
+        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()));
+        return $this->carbon->isAfter($toCarbon);
     }
 
-    public function add($years = 0, $months = 0, $days = 0): DateTimePlus
-    {
+    public function add(
+        $years = 0,
+        $months = 0,
+        $days = 0,
+        $hours = 0,
+        $minutes = 0,
+        $seconds = 0
+    ): DateTimePlus {
         $carbon = clone $this->carbon;
-        $sum = $carbon->addYears($years)->addMonths($months)->addDays($days);
+        $sum = $carbon
+            ->addYears($years)
+            ->addMonths($months)
+            ->addDays($days)
+            ->addHours($hours)
+            ->addMinutes($minutes)
+            ->addSeconds($seconds);
         return self::from(
-            $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->value),
-            FormatWithTimezone::ATOM,
-        );
-    }
-
-    public function addTime($hours = 0, $minutes = 0, $seconds = 0): DateTimePlus
-    {
-        $carbon = clone $this->carbon;
-        $sum = $carbon->addHours($hours)->addMinutes($minutes)->addSeconds($seconds);
-        return self::from(
-            $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->value),
+            $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->pattern()),
             FormatWithTimezone::ATOM,
         );
     }
 
     /**
-     * format.
+     * FormatPlus.
      *
      * Local aware formatting works with different formats than php DateTime.
      * It works with unicode date symbols.
      *
      * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/
      * @see https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
+     *
+     * Best practice it to show the DateTime in the users timezone and locale.
+     * That is why we always need to specify these two as function arguments
+     *
      **/
     public function formatPlus(
         string $format,
         string $locale,
-        ?DateTimeZone $displayTimeZone = null,
+        DateTimeZone $timeZone,
         ?IntlCalendar $calendar = null,
     ): string {
-        $timezone = $displayTimeZone ?: $this->toPhpDateTime()->getTimezone();
-
         $formatter = new IntlDateFormatter(
             locale: $locale,
             dateType: IntlDateFormatter::FULL, // defaults that won't be use since we always provide a pattern
             timeType: IntlDateFormatter::FULL, // defaults that won't be use since we always provide a pattern
-            timezone: $timezone,
-            calendar: $calendar ?: IntlCalendar::createInstance($timezone, $locale),
+            timezone: $timeZone,
+            calendar: $calendar ?: IntlCalendar::createInstance($timeZone, $locale),
             pattern: $format,
         );
 
         $formatted = $formatter->format($this->carbon->toDateTime());
         if (!$formatted) {
-            throw InvalidDateTimePlusFormatting::failedFormatting($format, $locale, $timezone);
+            throw InvalidDateTimePlusFormatting::failedFormatting($format, $locale, $timeZone);
         }
 
         return $formatted;
     }
 
-    public function getTimestamp(): int
+    public function timestamp(): int
     {
         return $this->carbon->getTimestamp();
     }
 
-    public function getTimezone(): DateTimeZone
+    public function timezone(): DateTimeZone
     {
         return $this->carbon->getTimezone();
     }
