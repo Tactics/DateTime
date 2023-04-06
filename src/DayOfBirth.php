@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tactics\DateTime;
 
 use Carbon\Carbon;
-use DateTimeImmutable;
 use DateTimeInterface;
 use Tactics\DateTime\Exception\InvalidDayOfBirth;
 
@@ -25,36 +24,34 @@ final class DayOfBirth
         return new DayOfBirth($dateTime);
     }
 
-    public function is(YearsOfAge $age, DateTimeInterface $on): bool
+    public function is(YearsOfAge $age, DateTimePlus $on): bool
     {
         $whenAge = $this->when($age);
-        $toCarbon = (new Carbon($whenAge))->startOfDay();
-        $onToCarbon = (new Carbon($on))->startOfDay();
+        $toCarbon = (new Carbon($whenAge->toPhpDateTime()))->startOfDay();
+        $onToCarbon = (new Carbon($on->toPhpDateTime()))->startOfDay();
 
         return $toCarbon->isSameDay($onToCarbon) || $toCarbon->isBefore($onToCarbon);
     }
 
-    public function when(YearsOfAge $age): DateTimeImmutable
+    public function when(YearsOfAge $age): DateTimePlus
     {
-        return $this->date->add(months: $age->inMonths())->asDateTimePlus()->toPhpDateTime();
+        return $this->date->add(months: $age->inMonths())->asDateTimePlus();
     }
-
-    public function toDateTime(): DateTimeImmutable
+    public function toDateTimePlus(): DateTimePlus
     {
-        return $this->date->asDateTimePlus()->toPhpDateTime();
+        return $this->date->asDateTimePlus();
     }
-
-    public function isSameDay(DateTimeInterface $dateTime): bool
+    public function isSameDay(DateTimePlus $dateTime): bool
     {
         return $this->date->asDateTimePlus()->isSameDay($dateTime);
     }
 
-    public function isBefore(DateTimeInterface $dateTime): bool
+    public function isBefore(DateTimePlus $dateTime): bool
     {
         return $this->date->asDateTimePlus()->isBefore($dateTime);
     }
 
-    public function isAfter(DateTimeInterface $dateTime): bool
+    public function isAfter(DateTimePlus $dateTime): bool
     {
         return $this->date->asDateTimePlus()->isAfter($dateTime);
     }

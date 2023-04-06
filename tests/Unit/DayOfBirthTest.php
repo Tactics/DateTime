@@ -44,7 +44,7 @@ final class DayOfBirthTest extends TestCase
             'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2023-01-01T00:00:00+00:00'),
             'date' => DateTimePlus::from('1986-04-25T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DayOfBirth|InvalidDayOfBirth $dayOfBirth) {
-                self::assertEquals('1986-04-25T00:00:00+00:00', $dayOfBirth->toDateTime()->format(DateTimeInterface::ATOM));
+                self::assertEquals('1986-04-25T00:00:00+00:00', $dayOfBirth->toDateTimePlus()->toPhpDateTime()->format(DateTimeInterface::ATOM));
             },
         ];
         yield 'A birthday can be derived from the day of birth' => [
@@ -53,7 +53,7 @@ final class DayOfBirthTest extends TestCase
             'test' => function (DayOfBirth|InvalidDayOfBirth $dayOfBirth) {
                 $age = YearsOfAge::from(years: 16);
                 $sweetSixteen = $dayOfBirth->when(age: $age);
-                self::assertEquals('2002-04-25', $sweetSixteen->format('Y-m-d'));
+                self::assertEquals('2002-04-25', $sweetSixteen->toPhpDateTime()->format('Y-m-d'));
             },
         ];
         yield 'A moment in time can be determined based on a date of birth' => [
@@ -62,7 +62,7 @@ final class DayOfBirthTest extends TestCase
             'test' => function (DayOfBirth|InvalidDayOfBirth $dayOfBirth) {
                 $age = YearsOfAge::from(years: 1, andXMonths: 10);
                 $twentyTwoMonths = $dayOfBirth->when(age: $age);
-                self::assertEquals('1988-02-25', $twentyTwoMonths->format('Y-m-d'));
+                self::assertEquals('1988-02-25', $twentyTwoMonths->toPhpDateTime()->format('Y-m-d'));
             },
         ];
         yield 'A datetime can be compared against a birthday to validate a person is below a certain age' => [
@@ -72,7 +72,7 @@ final class DayOfBirthTest extends TestCase
                 $eighteen = YearsOfAge::from(years: 18);
                 self::assertFalse($dayOfBirth->is(
                     age: $eighteen,
-                    on: DateTimeImmutable::createFromFormat('Y-m-d', '2004-04-24')
+                    on: DateTimePlus::from('2004-04-24T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
             }
         ];
@@ -83,7 +83,7 @@ final class DayOfBirthTest extends TestCase
                 $eighteen = YearsOfAge::from(years: 18);
                 self::assertTrue($dayOfBirth->is(
                     age: $eighteen,
-                    on: DateTimeImmutable::createFromFormat('Y-m-d', '2004-04-26')
+                    on: DateTimePlus::from('2004-04-26T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
             }
         ];
@@ -94,7 +94,7 @@ final class DayOfBirthTest extends TestCase
                 $eighteen = YearsOfAge::from(years: 18);
                 self::assertTrue($dayOfBirth->is(
                     age: $eighteen,
-                    on: DateTimeImmutable::createFromFormat('Y-m-d', '2004-04-25')
+                    on: DateTimePlus::from('2004-04-25T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
             }
         ];
@@ -103,10 +103,10 @@ final class DayOfBirthTest extends TestCase
             'date' => DateTimePlus::from('1986-04-25T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DayOfBirth|InvalidDayOfBirth $dayOfBirth) {
                 self::assertTrue($dayOfBirth->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-25')
+                    dateTime: DateTimePlus::from('1986-04-25T00:00:00+00:00', FormatWithTimezone::ATOM),
                 ));
                 self::assertFalse($dayOfBirth->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1987-04-25')
+                    dateTime: DateTimePlus::from('1987-04-25T00:00:00+00:00', FormatWithTimezone::ATOM),
                 ));
             }
         ];
@@ -115,11 +115,11 @@ final class DayOfBirthTest extends TestCase
             'date' => DateTimePlus::from('1986-04-25T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DayOfBirth|InvalidDayOfBirth $dayOfBirth) {
                 self::assertFalse($dayOfBirth->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-24')
+                    dateTime: DateTimePlus::from('1986-04-24T00:00:00+00:00', FormatWithTimezone::ATOM),
                 ));
 
                 self::assertTrue($dayOfBirth->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-26')
+                    dateTime: DateTimePlus::from('1986-04-26T00:00:00+00:00', FormatWithTimezone::ATOM),
                 ));
             },
         ];
@@ -128,11 +128,11 @@ final class DayOfBirthTest extends TestCase
             'date' => DateTimePlus::from('1986-04-25T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DayOfBirth|InvalidDayOfBirth $dayOfBirth) {
                 self::assertTrue($dayOfBirth->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-24')
+                    dateTime: DateTimePlus::from('1986-04-24T00:00:00+00:00', FormatWithTimezone::ATOM),
                 ));
 
                 self::assertFalse($dayOfBirth->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '1986-04-26')
+                    dateTime: DateTimePlus::from('1986-04-26T00:00:00+00:00', FormatWithTimezone::ATOM),
                 ));
             },
         ];

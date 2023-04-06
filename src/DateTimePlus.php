@@ -6,7 +6,6 @@ namespace Tactics\DateTime;
 
 use Carbon\Carbon;
 use DateTimeImmutable;
-use DateTimeInterface;
 use DateTimeZone;
 use IntlCalendar;
 use IntlDateFormatter;
@@ -129,21 +128,21 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         return $this->carbon->toDateTimeImmutable();
     }
 
-    public function isSameDay(DateTimeInterface $targetObject): bool
+    public function isSameDay(DateTimePlus $targetObject): bool
     {
         return $this->carbon
-            ->isSameDay($targetObject);
+            ->isSameDay($targetObject->toPhpDateTime());
     }
 
-    public function isBefore(DateTimeInterface $targetObject): bool
+    public function isBefore(DateTimePlus $targetObject): bool
     {
-        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()));
+        $toCarbon = (new Carbon($targetObject->toPhpDateTime(), $targetObject->timezone()));
         return $this->carbon->isBefore($toCarbon);
     }
 
-    public function isAfter(DateTimeInterface $targetObject): bool
+    public function isAfter(DateTimePlus $targetObject): bool
     {
-        $toCarbon = (new Carbon($targetObject, $targetObject->getTimezone()));
+        $toCarbon = (new Carbon($targetObject->toPhpDateTime(), $targetObject->timezone()));
         return $this->carbon->isAfter($toCarbon);
     }
 
@@ -163,6 +162,28 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
             ->addHours($hours)
             ->addMinutes($minutes)
             ->addSeconds($seconds);
+        return self::from(
+            $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->pattern()),
+            FormatWithTimezone::ATOM,
+        );
+    }
+
+    public function subtract(
+        $years = 0,
+        $months = 0,
+        $days = 0,
+        $hours = 0,
+        $minutes = 0,
+        $seconds = 0
+    ): DateTimePlus {
+        $carbon = clone $this->carbon;
+        $sum = $carbon
+            ->subYears($years)
+            ->subMonths($months)
+            ->subDays($days)
+            ->subHours($hours)
+            ->subMinutes($minutes)
+            ->subSeconds($seconds);
         return self::from(
             $sum->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->pattern()),
             FormatWithTimezone::ATOM,
@@ -213,5 +234,19 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
     public function timezone(): DateTimeZone
     {
         return $this->carbon->getTimezone();
+    }
+
+    public function alterTime(
+        int $hour,
+        int $minute,
+        int $second,
+    ): DateTimePlus {
+        $carbon = clone $this->carbon;
+        $changed = $carbon->setTime($hour, $minute,$second);
+
+        return self::from(
+            $changed->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->pattern()),
+            FormatWithTimezone::ATOM,
+        );
     }
 }

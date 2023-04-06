@@ -77,13 +77,13 @@ final class DateTimePlusTest extends TestCase
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertTrue($date->isSameDay(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T23:59:59+00:00')
+                    targetObject: DateTimePlus::from('1986-04-25T23:59:59+00:00', FormatWithTimezone::ATOM)
                 ));
                 self::assertFalse($date->isSameDay(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T00:00:00+00:00')
+                    targetObject: DateTimePlus::from('1986-04-26T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
                 self::assertTrue($date->isSameDay(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T23:59:59+02:00')
+                    targetObject: DateTimePlus::from('1986-04-25T23:59:59+02:00', FormatWithTimezone::ATOM)
                 ));
             }
         ];
@@ -92,19 +92,19 @@ final class DateTimePlusTest extends TestCase
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertFalse($date->isBefore(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-24T00:00:00+00:00')
+                    targetObject: DateTimePlus::from('1986-04-24T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertTrue($date->isBefore(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T00:00:00+00:00')
+                    targetObject: DateTimePlus::from('1986-04-26T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertFalse($date->isBefore(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T11:00:00+02:00')
+                    targetObject: DateTimePlus::from('1986-04-25T11:00:00+02:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertTrue($date->isBefore(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T13:00:00-02:00')
+                    targetObject: DateTimePlus::from('1986-04-25T13:00:00-02:00', FormatWithTimezone::ATOM)
                 ));
             },
         ];
@@ -114,19 +114,19 @@ final class DateTimePlusTest extends TestCase
             'format' => FormatWithTimezone::ATOM,
             'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
                 self::assertTrue($date->isAfter(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-24T12:00:00+00:00')
+                    targetObject: DateTimePlus::from('1986-04-24T12:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertFalse($date->isAfter(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-26T12:00:00+00:00')
+                    targetObject: DateTimePlus::from('1986-04-26T12:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertTrue($date->isAfter(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T11:00:00+02:00')
+                    targetObject: DateTimePlus::from('1986-04-25T11:00:00+02:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertFalse($date->isAfter(
-                    targetObject: DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '1986-04-25T13:00:00-02:00')
+                    targetObject: DateTimePlus::from('1986-04-25T13:00:00-02:00', FormatWithTimezone::ATOM)
                 ));
             },
         ];
@@ -333,6 +333,146 @@ final class DateTimePlusTest extends TestCase
 
     /**
      * @test
+     * @dataProvider dateSubProvider
+     */
+    public function date_convert_subtract(
+        DateTimePlus $dateTimePlus,
+        int $years,
+        int $months,
+        int $days,
+        int $hours,
+        int $minutes,
+        int $seconds,
+        callable $tests
+    ): void {
+        $date = $dateTimePlus->subtract(
+            years: $years,
+            months: $months,
+            days: $days,
+            hours: $hours,
+            minutes: $minutes,
+            seconds: $seconds,
+        );
+        $tests($dateTimePlus, $date);
+    }
+
+    public function dateSubProvider(): Generator
+    {
+        yield 'A date can be modified by years' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 10,
+            'months' => 0,
+            'days' => 0,
+            'hours' => 0,
+            'minutes' => 0,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1976-04-25T12:00:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by months' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 0,
+            'months' => 3,
+            'days' => 0,
+            'hours' => 0,
+            'minutes' => 0,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-01-25T12:00:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by days' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 0,
+            'months' => 0,
+            'days' => 2,
+            'hours' => 0,
+            'minutes' => 0,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-23T12:00:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by years, months and days' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 1,
+            'months' => 2,
+            'days' => 2,
+            'hours' => 0,
+            'minutes' => 0,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1985-02-23T12:00:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by hours' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 0,
+            'months' => 0,
+            'days' => 0,
+            'hours' => 14,
+            'minutes' => 0,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-24T22:00:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by minutes' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 0,
+            'months' => 0,
+            'days' => 0,
+            'hours' => 0,
+            'minutes' => 62,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T10:58:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by seconds' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 0,
+            'months' => 0,
+            'days' => 0,
+            'hours' => 0,
+            'minutes' => 0,
+            'seconds' => 62,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T11:58:58+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'A date can be modified by hours, minutes and seconds' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'years' => 0,
+            'months' => 0,
+            'days' => 0,
+            'hours' => 1,
+            'minutes' => 2,
+            'seconds' => 2,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T10:57:58+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+    }
+
+    /**
+     * @test
      * @dataProvider timestampProvider
      */
     public function date_from_timestamp(
@@ -417,6 +557,73 @@ final class DateTimePlusTest extends TestCase
                 self::assertEquals('1986-04-25 12:00:00.000000+00:00', $date->toStorage(StorageFormat::SQL_SERVER_DATETIME_OFFSET));
                 self::assertEquals('1986-04-25 12:00:00.000000 +00:00', $date->toStorage(StorageFormat::ORACLE_TIMESTAMP_WITH_TIMEZONE));
                 self::assertEquals('1986', $date->toStorage(StorageFormat::MYSQL_YEAR));
+            },
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider alterTimeProvider
+     */
+    public function date_alter_time(
+        DateTimePlus $dateTimePlus,
+        int $hours,
+        int $minutes,
+        int $seconds,
+        callable $tests
+    ): void {
+
+        $date = $dateTimePlus->alterTime(
+            hour: $hours,
+            minute: $minutes,
+            second: $seconds,
+        );
+        $tests($dateTimePlus, $date);
+    }
+
+    public function alterTimeProvider(): Generator
+    {
+        yield 'The time of a date can be altered by hours' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'hours' => 1,
+            'minutes' => 0,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T01:00:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'The time of a date can be altered by minutes' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'hours' => 0,
+            'minutes' => 2,
+            'seconds' => 0,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T00:02:00+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'The time of a date can be altered by seconds' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'hours' => 0,
+            'minutes' => 0,
+            'seconds' => 2,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T00:00:02+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+            },
+        ];
+
+        yield 'The time of a date can be altered by hours, minutes, seconds and microseconds' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'hours' => 1,
+            'minutes' => 2,
+            'seconds' => 2,
+            'test' => function (DateTimePlus $original, DateTimePlus $date) {
+                self::assertEquals('1986-04-25T12:00:00+00:00', $original->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
+                self::assertEquals('1986-04-25T01:02:02+00:00', $date->toPhpDateTime()->format(FormatWithTimezone::ATOM->pattern()));
             },
         ];
     }

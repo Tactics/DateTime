@@ -52,12 +52,12 @@ final class ClockAwareDateTime implements ClockAwareInterface
 
     public function isFuture(): bool
     {
-        return $this->asDateTimePlus()->isAfter($this->nowAsDateTimePlus()->toPhpDateTime());
+        return $this->asDateTimePlus()->isAfter($this->nowAsDateTimePlus());
     }
 
     public function isPast(): bool
     {
-        return $this->asDateTimePlus()->isBefore($this->nowAsDateTimePlus()->toPhpDateTime());
+        return $this->asDateTimePlus()->isBefore($this->nowAsDateTimePlus());
     }
 
     public function add($years = 0, $months = 0, $days = 0): ClockAwareDateTime

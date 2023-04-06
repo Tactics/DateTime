@@ -7,7 +7,6 @@ namespace Tactics\DateTime\Unit;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Tactics\DateTime\ClockAwareDateTime;
@@ -58,10 +57,10 @@ final class DueDateTest extends TestCase
             'date' => DateTimePlus::from('2023-02-02T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DueDate|InvalidDueDate $dueDate) {
                 self::assertTrue($dueDate->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-02-02')
+                    dateTime: DateTimePlus::from('2023-02-02T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
                 self::assertFalse($dueDate->isSameDay(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-01-02')
+                    dateTime: DateTimePlus::from('2023-01-02T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
             }
         ];
@@ -70,11 +69,11 @@ final class DueDateTest extends TestCase
             'date' => DateTimePlus::from('2023-02-02T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DueDate|InvalidDueDate $dueDate) {
                 self::assertFalse($dueDate->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-01-02')
+                    dateTime: DateTimePlus::from('2023-01-02T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertTrue($dueDate->isBefore(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-03-02')
+                    dateTime: DateTimePlus::from('2023-03-02T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
             },
         ];
@@ -83,11 +82,11 @@ final class DueDateTest extends TestCase
             'date' => DateTimePlus::from('2023-02-02T00:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (DueDate|InvalidDueDate $dueDate) {
                 self::assertTrue($dueDate->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-01-02')
+                    dateTime: DateTimePlus::from('2023-01-02T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
 
                 self::assertFalse($dueDate->isAfter(
-                    dateTime: DateTimeImmutable::createFromFormat('Y-m-d', '2023-03-02')
+                    dateTime: DateTimePlus::from('2023-03-02T00:00:00+00:00', FormatWithTimezone::ATOM)
                 ));
             },
         ];

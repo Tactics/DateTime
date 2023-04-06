@@ -22,13 +22,13 @@ final class YearsOfAge
         $this->years = (int) floor($months / 12);
     }
 
-    public static function on(DateTimeInterface $dateTime, DayOfBirth $dayOfBirth): YearsOfAge
+    public static function on(DateTimePlus $dateTime, DayOfBirth $dayOfBirth): YearsOfAge
     {
         if ($dayOfBirth->isAfter($dateTime)) {
             return new self(0);
         }
 
-        $diff = $dayOfBirth->toDateTime()->diff($dateTime);
+        $diff = $dayOfBirth->toDateTimePlus()->toPhpDateTime()->diff($dateTime->toPhpDateTime());
         return new self(($diff->y * 12) + $diff->m);
     }
 

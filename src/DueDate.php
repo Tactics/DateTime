@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tactics\DateTime;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use Tactics\DateTime\Exception\InvalidDueDate;
 
 final class DueDate
@@ -29,17 +28,17 @@ final class DueDate
         return $this->date->asDateTimePlus()->toPhpDateTime();
     }
 
-    public function isSameDay(DateTimeInterface $dateTime): bool
+    public function isSameDay(DateTimePlus $dateTime): bool
     {
         return $this->date->asDateTimePlus()->isSameDay($dateTime);
     }
 
-    public function isBefore(DateTimeInterface $dateTime): bool
+    public function isBefore(DateTimePlus $dateTime): bool
     {
         return $this->date->asDateTimePlus()->isBefore($dateTime);
     }
 
-    public function isAfter(DateTimeInterface $dateTime): bool
+    public function isAfter(DateTimePlus $dateTime): bool
     {
         return $this->date->asDateTimePlus()->isAfter($dateTime);
     }

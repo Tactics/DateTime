@@ -37,7 +37,7 @@ final class YearsOfAgeTest extends TestCase
      * @test
      * @dataProvider onProvider
      */
-    public function years_of_age_on(DateTimeImmutable $now, DateTimePlus $day_of_birth, callable $tests): void
+    public function years_of_age_on(DateTimePlus $now, DateTimePlus $day_of_birth, callable $tests): void
     {
         $date = ClockAwareDateTime::from(
             dateTimePlus: $day_of_birth,
@@ -54,7 +54,7 @@ final class YearsOfAgeTest extends TestCase
     public function onProvider(): iterable
     {
         yield 'The age in years on a certain day can be derived' => [
-            'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2023-01-01T12:00:00+00:00'),
+            'now' => DateTimePlus::from('2023-01-01T12:00:00+00:00', FormatWithTimezone::ATOM),
             'day_of_birth' => DateTimePlus::from('2020-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('2', $yearsOfAge->inYears());
@@ -62,7 +62,7 @@ final class YearsOfAgeTest extends TestCase
         ];
 
         yield 'The age in months on a certain day can be derived' => [
-            'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2023-01-01T12:00:00+00:00'),
+            'now' => DateTimePlus::from('2023-01-01T12:00:00+00:00', FormatWithTimezone::ATOM),
             'day_of_birth' => DateTimePlus::from('2020-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('32', $yearsOfAge->inMonths());
@@ -70,7 +70,7 @@ final class YearsOfAgeTest extends TestCase
         ];
 
         yield 'The age is always 0 when the day of birth is before the compared date' => [
-            'now' => DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, '2020-04-25T12:00:00+00:00'),
+            'now' => DateTimePlus::from('2020-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
             'day_of_birth' => DateTimePlus::from('2023-01-01T12:00:00+00:00', FormatWithTimezone::ATOM),
             'test' => function (YearsOfAge|InvalidYearsOfAge $yearsOfAge) {
                 self::assertEquals('0', $yearsOfAge->inYears());
