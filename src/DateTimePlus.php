@@ -242,7 +242,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         int $second,
     ): DateTimePlus {
         $carbon = clone $this->carbon;
-        $changed = $carbon->setTime($hour, $minute,$second);
+        $changed = $carbon->setTime($hour, $minute, $second);
 
         return self::from(
             $changed->toDateTimeImmutable()->format(FormatWithTimezone::ATOM->pattern()),

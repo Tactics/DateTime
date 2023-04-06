@@ -572,7 +572,6 @@ final class DateTimePlusTest extends TestCase
         int $seconds,
         callable $tests
     ): void {
-
         $date = $dateTimePlus->alterTime(
             hour: $hours,
             minute: $minutes,
