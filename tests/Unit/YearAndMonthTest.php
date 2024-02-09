@@ -21,8 +21,7 @@ final class YearAndMonthTest extends TestCase
         Year  $year,
         Month $month,
         callable $tests
-    ): void
-    {
+    ): void {
         $month = YearAndMonth::from($year, $month);
         $tests($month);
     }

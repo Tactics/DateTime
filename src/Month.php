@@ -13,8 +13,7 @@ final class Month
 {
     private function __construct(
         private readonly int $month
-    )
-    {
+    ) {
         if ($this->month < 1 || $this->month > 12) {
             throw InvalidMonth::notInScope();
         }
@@ -34,5 +33,4 @@ final class Month
     {
         return (string) $this->month;
     }
-
 }

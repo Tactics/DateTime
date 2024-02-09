@@ -10,8 +10,7 @@ final class DaysInMonth
 {
     private function __construct(
         private readonly int $days
-    )
-    {
+    ) {
         if ($this->days < 28 || $this->days > 31) {
             throw InvalidDaysInMonth::notInScope();
         }
@@ -31,5 +30,4 @@ final class DaysInMonth
     {
         return (string) $this->days;
     }
-
 }

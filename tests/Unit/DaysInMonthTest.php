@@ -18,8 +18,7 @@ final class DaysInMonthTest extends TestCase
     public function days_in_month(
         int      $value,
         callable $tests
-    ): void
-    {
+    ): void {
         try {
             $days = DaysInMonth::from($value);
         } catch (InvalidDaysInMonth $e) {
@@ -72,6 +71,5 @@ final class DaysInMonthTest extends TestCase
                 self::assertEquals('31', $days->asString());
             },
         ];
-
     }
 }
