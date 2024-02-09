@@ -10,20 +10,21 @@ class InvalidDateTimePlus extends LogicException
 
     public const NOT_STRICTLY_VALID_DATE = 2;
 
-    public static function invalidDate(): self
+    public static function invalidDate(string $raw): self
     {
         return new self(
-            'A date can only be created from a valid format and string combination',
+            sprintf('A date can only be created from a valid format and string combination, %s is invalid', $raw),
             self::INVALID_DATE
         );
     }
 
-    public static function notStrictlyValid(array $errors): self
+    public static function notStrictlyValid(array $errors, string $raw): self
     {
         return new self(
             sprintf(
-                'A date can only be created from a strictly valid DateTimeImmutable.
+                'A date can only be created from a strictly valid DateTimeImmutable. %s is invalid.
                     The passed DateTime contained %s warnings : %s and %s errors : %s ',
+                $raw,
                 $errors['warning_count'],
                 implode(
                     separator: ',',

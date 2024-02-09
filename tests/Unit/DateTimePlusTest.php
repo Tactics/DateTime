@@ -17,6 +17,7 @@ use Tactics\DateTime\Enum\DateTimePlus\FormatWithTimezone;
 use Tactics\DateTime\Enum\DateTimePlus\StorageFormat;
 use Tactics\DateTime\Exception\InvalidDateTimePlus;
 use Tactics\DateTime\Exception\InvalidDateTimePlusFormatting;
+use Tactics\DateTime\Year;
 
 final class DateTimePlusTest extends TestCase
 {
@@ -129,6 +130,40 @@ final class DateTimePlusTest extends TestCase
                     targetObject: DateTimePlus::from('1986-04-25T13:00:00-02:00', FormatWithTimezone::ATOM)
                 ));
             },
+        ];
+
+        yield 'A month and year can be obtained from a datetime' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                $yearAndMonth = $date->yearAndMonth();
+                self::assertEquals(1986, $yearAndMonth->year()->asInt());
+                self::assertEquals(4, $yearAndMonth->month()->asInt());
+            }
+        ];
+
+        yield 'A year can be obtained from a datetime' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals(1986, $date->year()->asInt());
+            }
+        ];
+
+        yield 'A month can be obtained from a datetime' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals(4, $date->month()->asInt());
+            }
+        ];
+
+        yield 'A day can be obtained from a datetime' => [
+            'raw' => '1986-04-25T12:00:00+00:00',
+            'format' => FormatWithTimezone::ATOM,
+            'test' => function (DateTimePlus|InvalidDateTimePlus $date) {
+                self::assertEquals(25, $date->day()->asInt());
+            }
         ];
     }
 
@@ -626,4 +661,38 @@ final class DateTimePlusTest extends TestCase
             },
         ];
     }
+
+    /**
+     * @test
+     * @dataProvider checkYearProvider
+     */
+    public function date_year_month_day_can_be_deduced(
+        DateTimePlus $dateTimePlus,
+        callable $tests
+    ): void {
+        $tests($dateTimePlus);
+    }
+
+    public function checkYearProvider(): Generator
+    {
+        yield 'A datetime can extract year, month and day' => [
+            'dateTimePlus' => DateTimePlus::from('1986-04-25T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'test' => function (DateTimePlus $original) {
+                self::assertEquals(1986, $original->year()->asInt());
+                self::assertEquals(4, $original->month()->asInt());
+                self::assertEquals(25, $original->day()->asInt());
+            },
+        ];
+
+        yield 'A datetime can extract year, month and day in leap year' => [
+            'dateTimePlus' => DateTimePlus::from('2024-02-29T12:00:00+00:00', FormatWithTimezone::ATOM),
+            'test' => function (DateTimePlus $original) {
+                self::assertEquals(2024, $original->year()->asInt());
+                self::assertEquals(2, $original->month()->asInt());
+                self::assertEquals(29, $original->day()->asInt());
+            },
+        ];
+    }
+
+
 }

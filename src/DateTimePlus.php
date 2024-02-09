@@ -38,7 +38,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
 
         // Make sure format and raw string combination is valid.
         if (!$dateTime instanceof DateTimeImmutable) {
-            throw InvalidDateTimePlus::invalidDate();
+            throw InvalidDateTimePlus::invalidDate($raw);
         }
 
         // DateTime manipulates "sort of" valid date (ex. 32/01/2022)
@@ -47,7 +47,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         // So we check to make sure there are no manipulations.
         $errors = $dateTime::getLastErrors();
         if ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
-            throw InvalidDateTimePlus::notStrictlyValid($errors);
+            throw InvalidDateTimePlus::notStrictlyValid($errors, $raw);
         }
 
         // Internally we use Carbon for easy calculations.
@@ -249,4 +249,36 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
             FormatWithTimezone::ATOM,
         );
     }
+
+    public function year() : Year
+    {
+        $year = (int) $this->toPhpDateTime()->format('Y');
+        return Year::from(
+            $year
+        );
+    }
+
+    public function month() : Month
+    {
+        $month = (int) $this->toPhpDateTime()->format('n');
+        return Month::from(
+            $month
+        );
+    }
+
+    public function day() : Day
+    {
+        $day = (int) $this->toPhpDateTime()->format('j');
+        return Day::from(
+            $day
+        );
+    }
+
+    public function yearAndMonth() : YearAndMonth
+    {
+        $year = $this->year();
+        $month = $this->month();
+        return YearAndMonth::from($year, $month);
+    }
+
 }
