@@ -250,7 +250,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
-    public function year() : Year
+    public function year(): Year
     {
         $year = (int) $this->toPhpDateTime()->format('Y');
         return Year::from(
@@ -258,7 +258,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
-    public function month() : Month
+    public function month(): Month
     {
         $month = (int) $this->toPhpDateTime()->format('n');
         return Month::from(
@@ -266,7 +266,7 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
-    public function day() : Day
+    public function day(): Day
     {
         $day = (int) $this->toPhpDateTime()->format('j');
         return Day::from(
@@ -274,11 +274,10 @@ final class DateTimePlus implements DateTimePlusInterface, EvolvableDateTimeInte
         );
     }
 
-    public function yearAndMonth() : YearAndMonth
+    public function yearAndMonth(): YearAndMonth
     {
         $year = $this->year();
         $month = $this->month();
         return YearAndMonth::from($year, $month);
     }
-
 }

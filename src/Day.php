@@ -10,8 +10,7 @@ final class Day
 {
     private function __construct(
         private readonly int $day
-    )
-    {
+    ) {
         if ($this->day < 1 || $this->day > 31) {
             throw InvalidDay::notInScope();
         }
@@ -31,5 +30,4 @@ final class Day
     {
         return (string) $this->day;
     }
-
 }

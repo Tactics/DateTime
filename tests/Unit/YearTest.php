@@ -17,8 +17,7 @@ final class YearTest extends TestCase
     public function year(
         int $value,
         callable $tests
-    ): void
-    {
+    ): void {
         try {
             $year = Year::from($value);
         } catch (InvalidYear $e) {
@@ -77,5 +76,4 @@ final class YearTest extends TestCase
             },
         ];
     }
-
 }

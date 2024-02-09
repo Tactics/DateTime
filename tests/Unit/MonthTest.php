@@ -19,8 +19,7 @@ final class MonthTest extends TestCase
     public function month(
         int $value,
         callable $tests
-    ): void
-    {
+    ): void {
         try {
             $month = Month::from($value);
         } catch (InvalidMonth $e) {
@@ -72,8 +71,5 @@ final class MonthTest extends TestCase
                 self::assertEquals('12', $month->asString());
             },
         ];
-
     }
-
 }
-

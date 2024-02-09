@@ -40,13 +40,13 @@ final class Year
         return (string) $this->year;
     }
 
-    public function firstDay() : DateTimePlus
+    public function firstDay(): DateTimePlus
     {
         $year = str_pad($this->asString(), 4, '0', STR_PAD_LEFT);
         return DateTimePlus::from($year . '-01-01T00:00:00+00:00', FormatWithTimezone::ATOM);
     }
 
-    public function lastDay() : DateTimePlus
+    public function lastDay(): DateTimePlus
     {
         $year = str_pad($this->asString(), 4, '0', STR_PAD_LEFT);
         return DateTimePlus::from($year . '-12-31T00:00:00+00:00', FormatWithTimezone::ATOM);

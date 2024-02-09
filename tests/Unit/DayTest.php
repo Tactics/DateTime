@@ -18,8 +18,7 @@ final class DayTest extends TestCase
     public function month(
         int $value,
         callable $tests
-    ): void
-    {
+    ): void {
         try {
             $day = Day::from($value);
         } catch (InvalidDay $e) {
@@ -72,6 +71,4 @@ final class DayTest extends TestCase
             },
         ];
     }
-
 }
-
