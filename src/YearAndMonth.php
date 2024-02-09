@@ -32,6 +32,16 @@ final class YearAndMonth
         return $this->month;
     }
 
+    public function firstDayOfYear() : DateTimePlus
+    {
+        return $this->year->firstDay();
+    }
+
+    public function lastDayOfYear() : DateTimePlus
+    {
+        return $this->year->lastDay();
+    }
+
     public function firstDayOfMonth() : DateTimePlus
     {
         $year = str_pad($this->year()->asString(), 4, '0', STR_PAD_LEFT);
