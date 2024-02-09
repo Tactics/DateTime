@@ -33,12 +33,12 @@ final class YearAndMonth
         return $this->month;
     }
 
-    public function firstDayOfYear() : DateTimePlus
+    public function firstDayOfYear(): DateTimePlus
     {
         return $this->year->firstDay();
     }
 
-    public function lastDayOfYear() : DateTimePlus
+    public function lastDayOfYear(): DateTimePlus
     {
         return $this->year->lastDay();
     }
